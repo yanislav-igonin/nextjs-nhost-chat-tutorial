@@ -22,3 +22,23 @@ export const CREATE_MESSAGE = gql`
     }
   }
 `;
+
+export const UPDATE_MESSAGE = gql`
+  mutation UpdateMessage($id: uuid!, $text: String!) {
+    update_messages(where: { id: { _eq: $id } }, _set: { text: $text }) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const DELETE_MESSAGE = gql`
+  mutation DeleteMessage($id: uuid!) {
+    delete_messages(where: { id: { _eq: $id } }) {
+      returning {
+        id
+      }
+    }
+  }
+`;

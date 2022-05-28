@@ -12,7 +12,12 @@ import UserMenu from '@components/UserMenu'
 import Message, { MessageProps } from '@components/Message'
 import MessageSkeleton from '@components/MessageSkeleton'
 
-import { GET_MESSAGES, CREATE_MESSAGE } from '@lib/queries'
+import {
+  GET_MESSAGES,
+  CREATE_MESSAGE,
+  DELETE_MESSAGE,
+  UPDATE_MESSAGE
+} from '@lib/queries'
 
 
 const Home: NextPage = () => {
@@ -29,17 +34,22 @@ const Home: NextPage = () => {
   let messages = data?.messages ?? []
 
   const [createMessage] = useMutation(CREATE_MESSAGE)
+  const [deleteMessage] = useMutation(DELETE_MESSAGE)
+  const [updateMessage] = useMutation(UPDATE_MESSAGE)
 
   const createMessageHandler = (text: string) => {
     if (!user) return
+    return createMessage({ variables: { object: { text } } })
+  }
 
-    return createMessage({
-      variables: {
-        object: {
-          text
-        },
-      },
-    })
+  const deleteMessageHandler = (id: string) => {
+    if (!id) return
+    return deleteMessage({ variables: { id } })
+  }
+
+  const updateMessageHandler = (id: string, text: string) => {
+    if (!id || !text) return
+    return updateMessage({ variables: { id, text } })
   }
 
   return (
@@ -91,7 +101,10 @@ const Home: NextPage = () => {
                     <ol className="my-6 space-y-2">
                       {messages.map((msg: MessageProps) => (
                         <li key={msg.id}>
-                          <Message {...msg} />
+                          <Message
+                            {...msg}
+                            onDelete={deleteMessageHandler}
+                            onEdit={updateMessageHandler} />
                         </li>
                       ))}
                     </ol>
