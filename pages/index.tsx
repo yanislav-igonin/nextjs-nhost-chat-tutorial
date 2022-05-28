@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import { useAuthenticationStatus, useUserData } from '@nhost/nextjs'
-import { useSubscription } from '@apollo/client'
+import { useSubscription, useMutation } from '@apollo/client'
 
 import logo from '../public/logo.svg'
 import Form from '@components/Form'
@@ -12,7 +12,7 @@ import UserMenu from '@components/UserMenu'
 import Message, { MessageProps } from '@components/Message'
 import MessageSkeleton from '@components/MessageSkeleton'
 
-import { GET_MESSAGES } from '@lib/queries'
+import { GET_MESSAGES, CREATE_MESSAGE } from '@lib/queries'
 
 
 const Home: NextPage = () => {
@@ -27,6 +27,20 @@ const Home: NextPage = () => {
     skip: isLoadingUser || !isAuthenticated,
   })
   let messages = data?.messages ?? []
+
+  const [createMessage] = useMutation(CREATE_MESSAGE)
+
+  const createMessageHandler = (text: string) => {
+    if (!user) return
+
+    return createMessage({
+      variables: {
+        object: {
+          text
+        },
+      },
+    })
+  }
 
   return (
     <>
@@ -92,7 +106,7 @@ const Home: NextPage = () => {
 
 
               <div className="mx-auto mb-6 w-full max-w-screen-md flex-shrink-0 px-4">
-                <Form />
+                <Form onSubmit={createMessageHandler} />
               </div>
             </>
           )}
